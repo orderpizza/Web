@@ -1,0 +1,11 @@
+<!-- search_results.html -->
+{% if movie_clips %}
+    <h2>Search Results:</h2>
+    <ul>
+        {% for movie_clip in movie_clips %}
+            <li>{{ movie_clip.filename }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No movie clips found for the given Korean sentence.</p>
+{% endif %}
