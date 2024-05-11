@@ -97,6 +97,16 @@
             color: white;
             font-size: 18px;
         }
+
+        .search-results {
+            margin-top: 20px;
+        }
+
+        .search-results li {
+            list-style-type: none;
+            margin-bottom: 10px;
+        }
+
     </style>
 </head>
 <body>
@@ -105,27 +115,65 @@
         <h1>Welcome to My Website</h1>
     </div>
     <div id="video-container">
-        <video controls autoplay>
-            <source src="your_video_clip.mp4" type="video/mp4">
+        <video id="main-video" controls autoplay>
+            <!-- Initial video source -->
+            <source src="{{ urls.0 }}" type="video/mp4">
             Your browser does not support the video tag.
         </video>
         <button class="nav-button next-button" onclick="goToNext()">Next</button>
         <button class="nav-button prev-button" onclick="goToPrevious()">Previous</button>
-        <div id="result-number">1/20</div>
+        <div id="result-number">1/{{ urls|length }}</div>
     </div>
     <div id="input-container">
-        <input type="text" placeholder="Enter Korean sentence...">
-        {% include 'search_form.html' %}
+        <form id="search-form" action="{% url 'search_movie_clip' %}" method="post">
+            {% csrf_token %}
+            <input type="text" name="korean_sentence" placeholder="Enter Korean sentence...">
+            <button type="submit">Search</button>
+        </form>
+    </div>    
+
+    <div class="search-results">
+        {% if movie_clips %}
+            <h2>Search Results</h2>
+            <ul>
+                {% for clip in movie_clips %}
+                    <li>
+                        <video controls>
+                            <source src="C:\Users\lseun\Desktop\Web\split_clips/{{ clip.filename }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No results found</p>
+        {% endif %}
     </div>
 
     <script>
+        var currentIndex = 0;
+        var urls = {{ urls|safe }};
+    
+        function updateVideoSource(index) {
+            document.getElementById('main-video').src = urls[index];
+            document.getElementById('result-number').innerText = (index + 1) + '/' + urls.length;
+            currentIndex = index;
+        }
+    
         function goToPrevious() {
-            // Logic to navigate to the previous video
+            if (currentIndex > 0) {
+                updateVideoSource(currentIndex - 1);
+            }
         }
-
+    
         function goToNext() {
-            // Logic to navigate to the next video
+            if (currentIndex < urls.length - 1) {
+                updateVideoSource(currentIndex + 1);
+            }
         }
+    
+        // Initialize video source
+        updateVideoSource(currentIndex);
     </script>
 </body>
 </html>
